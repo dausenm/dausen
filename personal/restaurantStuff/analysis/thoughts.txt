@@ -1,0 +1,35 @@
+ideas for this:
+    array[][]
+        columns = columns from the pdf, rows = rows from pdf
+
+
+    reading / writing
+        write to report with name "reportmmddyyyy"
+        read from previous report when you go to compare with previous week
+
+    MAIN ISSUES:
+        reading and storing data from weekly report
+            how are we going to store the information from the pdf?
+                parse through unnecessary chars and store the important ones.
+                do we store values in the order they appear or in a pre determined order?
+                    if we do it in a pre determined order, it makes comparisons with other weeks more easily.
+                        clunkier code  
+                        what happens if they add a new menu item?
+                        specials for the week?
+                    if we do it in the order it appears in the pdf, it makes the code much less clunky.
+                        this is likely the approach we should take
+                        class item{
+                            private:
+                                int type; //type will represent what type of item it is. e.g. 1 = food, 2 = beer, 3 = cocktail
+                                string name;
+                                double total;
+                                double percentCat;
+                                double percentTot;
+                        }
+                        while(!eof){
+                            cin >> name >> total >> percentCat >> percentTot;
+                        }
+                    
+
+        creating a report of our own in order to have persistent storage for the program.
+
