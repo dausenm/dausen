@@ -121,15 +121,19 @@ int main(){
 
     cout << "\n\n6----------------------------------------------\n\n";
 
-    //RBTree <char, int> T3;
+    // RBTree <char, int> T3;
 
-    //T3 = T2;
+    // T3 = T2;
 
-    T2.remove('F');
+    T2.insert('H', 8);
 
     T2.inorder();
 
-    //cout << "\n\n7----------------------------------------------\n\n";
+    cout << "\n\n7----------------------------------------------\n\n";
 
-    //T3.inorder();
+    T2.preorder();
+
+    T2.remove('B');
+
+    T2.inorder();
 }
