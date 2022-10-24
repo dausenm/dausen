@@ -54,12 +54,12 @@ struct Node{
         }
 
         void printNode(Node <K, V> *p){
-            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            // if(p->red) cout << "red\n";
+            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            if(p->red) cout << "red\n";
 
-            // else cout << "black\n";
+            else cout << "black\n";
 
-            cout << p->key << " ";
+            //cout << p->key << " ";
         }
 
         // Node <K, V> copy(const Node <K, V> &old){
@@ -224,7 +224,7 @@ class RBTree{
                 }
             }
 
-            cout << "----------------------------------------------\n\n";
+            //cout << "----------------------------------------------\n\n";
             return;
         }
 
@@ -627,11 +627,11 @@ class RBTree{
         }
 
         void printNode(Node <K, V> *p){     //fix this one before submitting
-            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            // if(p->red) cout << "red\n";
+            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            if(p->red) cout << "red\n";
 
-            // else cout << "black\n";
-            cout << p->key << " ";
+            else cout << "black\n";
+            //cout << p->key << " ";
         }
 
         void fixup(){
@@ -691,7 +691,21 @@ class RBTree{
             Node <K, V> *buf = n->right->left;
 
             if(n->parent != nullptr){
-                
+                n->parent->replace();
             }
+            else{
+                root = n->right;
+                root->parent = nullptr;
+            }
+
+            n->right->setChild(Node <K, V>);
         }
 };
+
+/*
+this is pretty fucked. i've got a lot of work to do if i'm gonna make an 80 on this shit. i need to write the fixup functions for remove and insert. 
+check if you can use the ones from the book or maybe modify the ones from the book, but either way, it's gonna take some time. 
+
+the insertBal function and rotateLeft / rotateRight functions are in here now, but you're probably gonna have to remove them and fix them later.
+you got this homie. clear your head, get some coffee and some water, and bang this shit out.
+*/
