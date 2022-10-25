@@ -642,64 +642,84 @@ class RBTree{
             delete tbd;
         }
 
-        void balInsert(Node <K, V> *leaf){
-            if (leaf = head){
-                leaf->red = false;
-            }
-            if (!leaf->parent->red){
-                return;
-            }
-
-            Node <K, V> *parent = leaf->parent;
-            Node <K, V> *grandparent = leaf->parent->parent;
-            Node <K, V> *uncle;
-            if(leaf->key < leaf->parent->key){
-                uncle = parent->right;
-            }
-            else uncle = parent->left;
-
-            if((uncle != nullptr) && uncle->red){
-                parent->red = false;
-                uncle->red = false;
-                grandparent->red = true;
-                balInsert(grandparent);
-                return;
-            }
-
-            if(leaf->key > parent->key && parent->key < grandparent->key){
-                rotateLeft(parent);
-                leaf = parent;
-                parent = leaf->parent;
-            }
-
-            else if(leaf->key < parent->key && parent->key > grandparent->key){
-                rotateRight(parent);
-                leaf = parent;
-                parent = leaf->parent;
-            }
-
-            parent->red = false;
-            grandparent->red = true;
-
-            if(leaf->key < parent->key){
-                rotateRight(grandparent);
-            }
-            else rotateLeft(grandparent);
+        void rotateRight(){
+            //TODO: Rotate Right func
         }
 
-        Node <K, V> *rotateLeft(Node <K, V> *n){
-            Node <K, V> *buf = n->right->left;
-
-            if(n->parent != nullptr){
-                n->parent->replace();
-            }
-            else{
-                root = n->right;
-                root->parent = nullptr;
-            }
-
-            n->right->setChild(Node <K, V>);
+        void rotateLeft(){
+            //TODO: Rotate Left func
         }
+
+        void insertFixUp(){
+            //TODO: Insert Fix Up func
+        }
+
+        void delFixUp(){
+            //TODO: Delete Fix Up func
+        }
+
+        void transplant(){
+            //TODO: transplant func
+        }
+
+        // void balInsert(Node <K, V> *leaf){
+        //     if (leaf = head){
+        //         leaf->red = false;
+        //     }
+        //     if (!leaf->parent->red){
+        //         return;
+        //     }
+
+        //     Node <K, V> *parent = leaf->parent;
+        //     Node <K, V> *grandparent = leaf->parent->parent;
+        //     Node <K, V> *uncle;
+        //     if(leaf->key < leaf->parent->key){
+        //         uncle = parent->right;
+        //     }
+        //     else uncle = parent->left;
+
+        //     if((uncle != nullptr) && uncle->red){
+        //         parent->red = false;
+        //         uncle->red = false;
+        //         grandparent->red = true;
+        //         balInsert(grandparent);
+        //         return;
+        //     }
+
+        //     if(leaf->key > parent->key && parent->key < grandparent->key){
+        //         rotateLeft(parent);
+        //         leaf = parent;
+        //         parent = leaf->parent;
+        //     }
+
+        //     else if(leaf->key < parent->key && parent->key > grandparent->key){
+        //         rotateRight(parent);
+        //         leaf = parent;
+        //         parent = leaf->parent;
+        //     }
+
+        //     parent->red = false;
+        //     grandparent->red = true;
+
+        //     if(leaf->key < parent->key){
+        //         rotateRight(grandparent);
+        //     }
+        //     else rotateLeft(grandparent);
+        // }
+
+        // Node <K, V> *rotateLeft(Node <K, V> *n){
+        //     Node <K, V> *buf = n->right->left;
+
+        //     if(n->parent != nullptr){
+        //         n->parent->replace();
+        //     }
+        //     else{
+        //         root = n->right;
+        //         root->parent = nullptr;
+        //     }
+
+        //     n->right->setChild(Node <K, V>);
+        // }
 };
 
 /*
