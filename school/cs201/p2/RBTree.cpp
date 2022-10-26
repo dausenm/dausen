@@ -54,12 +54,12 @@ struct Node{
         }
 
         void printNode(Node <K, V> *p){
-            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            if(p->red) cout << "red\n";
+            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            // if(p->red) cout << "red\n";
 
-            else cout << "black\n";
+            // else cout << "black\n";
 
-            //cout << p->key << " ";
+            cout << p->key << " ";
         }
 
         // Node <K, V> copy(const Node <K, V> &old){
@@ -90,15 +90,24 @@ class RBTree{
     private:
         int i;
         Node <K, V> *head;
+        //Node <K, V> *nullptr;
 
     public:
         RBTree(){       //this is good
             i = 0;
             head = nullptr;
+            // nullptr->red = false;
+            // nullptr->left = nullptr;
+            // nullptr->right = nullptr;
+            // nullptr->parent = nullptr;
         }
 
         RBTree(K keys[], V vals[], int s){  //this is good
             head = nullptr;
+            // nullptr->red = false;
+            // nullptr->left = nullptr;
+            // nullptr->right = nullptr;
+            // nullptr->parent = nullptr;
             i = 0;
             for (int i = 0; i < s; i++){
                 insert(keys[i], vals[i]);
@@ -139,7 +148,7 @@ class RBTree{
         V *search(K keys){      //this should be working
             Node <K, V> *trav = head;
 
-            V *rt = nullptr;
+            V *rt = NULL;
 
             while (trav != nullptr){
                 if (trav->key == keys){
@@ -177,6 +186,8 @@ class RBTree{
                 head = buf;
                 head->red = false;
                 head->parent = nullptr;
+                // nullptr->key = keys;
+                // nullptr->value = val;
                 i++;
                 return;
             }
@@ -195,6 +206,7 @@ class RBTree{
                         buf->red = true;
                         i++;
                         placed = true;
+                        insertFixUp(buf);
                         return;
                     }
 
@@ -214,6 +226,7 @@ class RBTree{
                         buf->red = true;
                         placed = true;
                         i++;
+                        insertFixUp(buf);
                         return;
                     }
 
@@ -245,26 +258,30 @@ class RBTree{
                     if (keys == trav->key){
                         // cout << "\tD: hey dude you made it here you fucking stupid idiot who doesn't know how to code\n";
                         i--;
-                        if(trav == head){
+                        if(trav == head){   //this branch for if we are removing the root of the tree
                             if(trav->left == nullptr){
-                                if (trav->right == nullptr){
-                                    if(head->right == nullptr){
-                                        head == nullptr;
-                                        del(trav);
-                                        return 1;
-                                    }
+                                if (trav->right == nullptr){    //this branch for if the root is the only element in the tree
+                                    head == nullptr;
+                                    del(trav);
+                                    return 1;
                                 }
-                                head = head->right;
+                                head = head->right;     //this is for if there are no elements to the left of the root, but there are elements to the right
                                 del(trav);
                                 return 1;
                             }
                             // cout << "\tD: you made it here boy\n";
-                            trav = trav->left;
+                            trav = trav->left;      //this branch for when you are removing the root and there are elements to the left
 
-                            
+                            if(head->right == nullptr){     //if left of the root is not null, make the left child of the root the new root and delete the old root
+                                trav = head;
+                                head= head->left;
+                                del(trav);
+                                return 1;
+                            }
+
                             n = trav;
 
-                            if(trav->right != nullptr){
+                            if(trav->right != nullptr){     //if the right child of the left child of the root is null, do this if body
 
                                 // cout << "\t\t\t b = true\n";
                                 b = true;
@@ -351,6 +368,11 @@ class RBTree{
                                 }
                                 else{
                                     trav->parent->right = trav->right;
+                                    trav->right->parent = trav->parent;
+                                    trav->right = nullptr;
+                                    trav->parent = nullptr;
+                                    trav->left = nullptr;
+                                    del(trav);
                                     return 1;
                                 }
                             }
@@ -602,8 +624,9 @@ class RBTree{
             int p = 1;
             printNode(trav);
             last = trav->key;       //this block here could cause rank tracking issues
-            trav = trav->parent;    //keep this in mind if you have issues with this in larger trees
-
+            if(trav->parent != nullptr){
+                trav = trav->parent;    //keep this in mind if you have issues with this in larger trees
+            }
             while(p < k){
 
                 if(trav->left != nullptr && trav->left->key > last){
@@ -611,9 +634,11 @@ class RBTree{
                     continue;
                 }
 
-                printNode(trav);
-                p++;
-                last = trav->key;
+                if(trav->key > last){
+                    printNode(trav);
+                    p++;
+                    last = trav->key;
+                }
 
                 if(trav->right != nullptr && trav->right->key > last){
                     trav = trav->right;
@@ -622,16 +647,17 @@ class RBTree{
 
                 trav = trav->parent;
             }
-
+            cout << endl;
+            
             return;
         }
 
         void printNode(Node <K, V> *p){     //fix this one before submitting
-            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            if(p->red) cout << "red\n";
+            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            // if(p->red) cout << "red\n";
 
-            else cout << "black\n";
-            //cout << p->key << " ";
+            // else cout << "black\n";
+            cout << p->key << " ";
         }
 
         void fixup(){
@@ -642,90 +668,168 @@ class RBTree{
             delete tbd;
         }
 
-        void rotateRight(){
-            //TODO: Rotate Right func
+        void rotateRight(Node <K, V> *x){
+            Node <K, V> *y;
+            x->left = y->left;
+
+            if(y->right != nullptr){
+                y->right->parent = x;
+            }
+
+            y->parent = x->parent;
+
+            if(x->parent = nullptr){
+                head = y;
+            }
+            else if(x == x->parent->right){
+                x->parent->right = y;
+            }
+            else{
+                x->parent->left = y;
+            }
+
+            y->right = x;
+            x->parent = y;
         }
 
-        void rotateLeft(){
-            //TODO: Rotate Left func
+        void rotateLeft(Node <K, V> *x){
+            Node <K, V> *y = x->right;
+            x->right = y->left;
+
+            if(y->left != nullptr){
+                y->left->parent = x;
+            }
+
+            y->parent = x->parent;
+
+            if(x->parent == nullptr){
+                head = y;
+            }
+            else if(x == x->parent->left){
+                x->parent->left = y;
+            }
+            else{
+                x->parent->right = y;
+            }
+
+            y->left = x;
+            x->parent = y;
+
+            return;
         }
 
-        void insertFixUp(){
-            //TODO: Insert Fix Up func
+        void insertFixUp(Node <K, V> *z){
+            while(z->parent->red){
+                printf("\tD: you are here\n");
+                if(z->parent == z->parent->parent->left){
+                    Node <K, V> *y = z->parent->parent->right;
+                    if(y->red){
+                        z->parent->red = false;
+                        y->red = false;
+                        z->parent->parent->red = true;
+                        z = z->parent->parent;
+                    }
+                    else if(z == z->parent->right){
+                        z = z->parent;
+                        rotateLeft(z);
+                    }
+                    z->parent->red = false;
+                    z->parent->parent->red = true;
+                    rotateRight(z->parent->parent);
+                }
+                else{
+                    Node <K, V> *y = z->parent->parent->left;
+                    if(y->red){
+                        z->parent->red = false;
+                        y->red = false;
+                        z->parent->parent->red = true;
+                        z = z->parent->parent;
+                    }
+                    else if(z == z->parent->left){
+                        z = z->parent;
+                        rotateRight(z);
+                    }
+                    z->parent->red = false;
+                    z->parent->parent->red = true;
+                    rotateLeft(z->parent->parent);
+                }
+            }
+            head->red = false;
         }
 
-        void delFixUp(){
-            //TODO: Delete Fix Up func
+        void removeFixUp(Node <K, V> *x){
+            while(x != head && x->red == false){
+                if(x == x->parent->left){
+                    Node <K, V> *w = x->parent->right;
+                    if(w->red){
+                        w->red = false;
+                        x->parent->red = true;
+                        rotateLeft(x->parent);
+                        w = x->parent->right;
+                    }
+                    if(!w->left->red && !w->right->red){
+                        w->red = true;
+                        x = x->parent;
+                    }
+                    else if(!w->right->red){
+                        w->left->red = false;
+                        w->red = true;
+                        rotateRight(w);
+                        w = x->parent->right;
+                    }
+                    w->red = x->parent->red;
+                    x->parent->red = false;
+                    w->right->red = false;
+                    rotateLeft(x->parent);
+                    x = head;
+                }
+                else{
+                    Node <K, V> *w = x->parent->left;
+                    if(w->red){
+                        w->red = false;
+                        x->parent->red = true;
+                        rotateRight(x->parent);
+                        w = x->parent->left;
+                    }
+                    if(!w->right->red && !w->left->red){
+                        w->red = true;
+                        x = x->parent;
+                    }
+                    else if(!w->left->red){
+                        w->right->red = false;
+                        w->red = true;
+                        rotateLeft(w);
+                        w = x->parent->left;
+                    }
+                    w->red = x->parent->red;
+                    x->parent->red = false;
+                    w->left->red = false;
+                    rotateRight(x->parent);
+                    x = head;
+                }
+                x->red = false;
+            }
         }
 
-        void transplant(){
-            //TODO: transplant func
+        void transplant(Node <K, V> *u, Node <K, V> *v){
+            if(u->parent == nullptr){
+                head = v;
+            }
+            else if(u == u->parent->left){
+                u->parent->left = v;
+            }
+            else{
+                u->parent->right = v;
+            }
+            v->parent = u->parent;
+
+            return;
         }
-
-        // void balInsert(Node <K, V> *leaf){
-        //     if (leaf = head){
-        //         leaf->red = false;
-        //     }
-        //     if (!leaf->parent->red){
-        //         return;
-        //     }
-
-        //     Node <K, V> *parent = leaf->parent;
-        //     Node <K, V> *grandparent = leaf->parent->parent;
-        //     Node <K, V> *uncle;
-        //     if(leaf->key < leaf->parent->key){
-        //         uncle = parent->right;
-        //     }
-        //     else uncle = parent->left;
-
-        //     if((uncle != nullptr) && uncle->red){
-        //         parent->red = false;
-        //         uncle->red = false;
-        //         grandparent->red = true;
-        //         balInsert(grandparent);
-        //         return;
-        //     }
-
-        //     if(leaf->key > parent->key && parent->key < grandparent->key){
-        //         rotateLeft(parent);
-        //         leaf = parent;
-        //         parent = leaf->parent;
-        //     }
-
-        //     else if(leaf->key < parent->key && parent->key > grandparent->key){
-        //         rotateRight(parent);
-        //         leaf = parent;
-        //         parent = leaf->parent;
-        //     }
-
-        //     parent->red = false;
-        //     grandparent->red = true;
-
-        //     if(leaf->key < parent->key){
-        //         rotateRight(grandparent);
-        //     }
-        //     else rotateLeft(grandparent);
-        // }
-
-        // Node <K, V> *rotateLeft(Node <K, V> *n){
-        //     Node <K, V> *buf = n->right->left;
-
-        //     if(n->parent != nullptr){
-        //         n->parent->replace();
-        //     }
-        //     else{
-        //         root = n->right;
-        //         root->parent = nullptr;
-        //     }
-
-        //     n->right->setChild(Node <K, V>);
-        // }
 };
 
 /*
 this is pretty fucked. i've got a lot of work to do if i'm gonna make an 80 on this shit. i need to write the fixup functions for remove and insert. 
 check if you can use the ones from the book or maybe modify the ones from the book, but either way, it's gonna take some time. 
-
 the insertBal function and rotateLeft / rotateRight functions are in here now, but you're probably gonna have to remove them and fix them later.
 you got this homie. clear your head, get some coffee and some water, and bang this shit out.
 */
