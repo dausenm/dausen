@@ -119,6 +119,8 @@ int main(){
 
     T2.inorder();
 
+    T2.preorder();
+
     cout << "\n\n6----------------------------------------------\n\n";
 
     // RBTree <char, int> T3;
@@ -126,8 +128,11 @@ int main(){
     // T3 = T2;
 
     T2.insert('H', 8);
+    T2.insert('I', 9);
 
     T2.inorder();
+    
+    T2.preorder();
 
     cout << "\n\n7----------------------------------------------\n\n";
 

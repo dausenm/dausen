@@ -54,12 +54,12 @@ struct Node{
         }
 
         void printNode(Node <K, V> *p){
-            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            // if(p->red) cout << "red\n";
+            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            if(p->red) cout << "red\n";
 
-            // else cout << "black\n";
+            else cout << "black\n";
 
-            cout << p->key << " ";
+            // cout << p->key << " ";
         }
 
         // Node <K, V> copy(const Node <K, V> &old){
@@ -181,6 +181,7 @@ class RBTree{
 
         void insert(K keys, V val){     //this is the majority of the work that is left
             Node <K, V> *buf = new Node(keys, val);
+            cout << "\tD: you are inserting " << buf->key << endl;
 
             if(head == nullptr){
                 head = buf;
@@ -653,11 +654,11 @@ class RBTree{
         }
 
         void printNode(Node <K, V> *p){     //fix this one before submitting
-            // cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
-            // if(p->red) cout << "red\n";
+            cout << "\tD: Fix this later:\tkey: " << p->key << "  val:  " << p->value << " color:  ";
+            if(p->red) cout << "red\n";
 
-            // else cout << "black\n";
-            cout << p->key << " ";
+            else cout << "black\n";
+            // cout << p->key << " ";
         }
 
         void fixup(){
@@ -693,13 +694,15 @@ class RBTree{
         }
 
         void rotateLeft(Node <K, V> *x){
+            cout << "\tD: hey dude we here now\n";
+
             Node <K, V> *y = x->right;
             x->right = y->left;
 
             if(y->left != nullptr){
                 y->left->parent = x;
             }
-
+            cout << "\tD: hey dude we here now1\n";
             y->parent = x->parent;
 
             if(x->parent == nullptr){
@@ -711,49 +714,86 @@ class RBTree{
             else{
                 x->parent->right = y;
             }
-
+            cout << "\tD: hey dude we here now2\n";
             y->left = x;
             x->parent = y;
+            y->red = false;
+            y->left->red = true;
+            y->right->red = true;
 
             return;
         }
 
         void insertFixUp(Node <K, V> *z){
-            while(z->parent->red){
-                printf("\tD: you are here\n");
+            while(z->parent->red && z->parent != nullptr){
+                cout << "\tD: top while, z = " << z->key << endl;
+
+                // if(z->key == 'I'){
+                //     rotateLeft(z->parent->parent);
+                //     return;
+                // }
+                if(z == nullptr) {
+                    cout << "\tD: i wonder if this is executing\n";
+                    break;
+                }
                 if(z->parent == z->parent->parent->left){
+                    cout <<"\tD: damn homie it would be nice if you knew what was happening\n";
                     Node <K, V> *y = z->parent->parent->right;
-                    if(y->red){
+                    if(y != nullptr){
+                        if(y->red){
+                            z->parent->red = false;
+                            y->red = false;
+                            z->parent->parent->red = true;
+                            z = z->parent->parent;
+                        }
+                        else if(z == z->parent->right){
+                            z = z->parent;
+                            rotateLeft(z);
+                        }
                         z->parent->red = false;
-                        y->red = false;
                         z->parent->parent->red = true;
-                        z = z->parent->parent;
+                        rotateRight(z->parent->parent);
                     }
-                    else if(z == z->parent->right){
-                        z = z->parent;
-                        rotateLeft(z);
-                    }
-                    z->parent->red = false;
-                    z->parent->parent->red = true;
-                    rotateRight(z->parent->parent);
                 }
                 else{
-                    Node <K, V> *y = z->parent->parent->left;
-                    if(y->red){
-                        z->parent->red = false;
-                        y->red = false;
-                        z->parent->parent->red = true;
-                        z = z->parent->parent;
+                    bool grandparent = true, uncle = true;
+                    if(z->parent->parent == nullptr) grandparent = false;
+                    if(z->parent->parent->left == nullptr) uncle = false;
+                    cout << "\tD: ur here bro\n\t\tuncle = " << uncle << "\tgrandparent = " << grandparent << endl;
+                    Node <K, V> *y = nullptr; 
+                    if(uncle) y = z->parent->parent->left;
+                    if(y != nullptr){
+                        if(y->red){
+                            z->parent->red = false;
+                            y->red = false;
+                            cout << "\tD: parent = " << z->parent->key << "\tuncle = " << y->key << endl;
+                            cout << "\tD: parent and uncle set to black\n";
+                            if(grandparent){
+                                z->parent->parent->red = true;
+                                z = z->parent->parent;
+                                if (z->parent == nullptr) break;
+                                continue;
+                            }
+                            else if(z == z->parent->left){
+                                z = z->parent;
+                                rotateRight(z);
+                            }
+                            cout << "\tD: you want to see this\n";
+                            z->parent->red = false;
+                            z->parent->parent->red = true;
+                            rotateLeft(z->parent->parent);
+                        }
                     }
-                    else if(z == z->parent->left){
-                        z = z->parent;
-                        rotateRight(z);
+                    else if (z->parent->parent != nullptr && z->parent->parent->left == nullptr && z->parent->red && z->parent->parent->red == false){
+                        cout << "\tD: hello world!\n\t\t\tparent = " << z->parent->key << "\tgrandpa = " << z->parent->parent->key << endl;;
+                        rotateLeft(z->parent->parent);
+                        return;
                     }
-                    z->parent->red = false;
-                    z->parent->parent->red = true;
-                    rotateLeft(z->parent->parent);
+                    z = z->parent;
                 }
+                    cout << "\td: ur here homie\n\t\tbottom while btw";
             }
+            cout << "\tD: if this prints i'll be even more confused\n";
             head->red = false;
         }
 
@@ -832,4 +872,9 @@ this is pretty fucked. i've got a lot of work to do if i'm gonna make an 80 on t
 check if you can use the ones from the book or maybe modify the ones from the book, but either way, it's gonna take some time. 
 the insertBal function and rotateLeft / rotateRight functions are in here now, but you're probably gonna have to remove them and fix them later.
 you got this homie. clear your head, get some coffee and some water, and bang this shit out.
+
+when i left off tonight, rotate left works as intended. the main issue we are facing right now is making it exectute only when it's supposed to execute.
+last time i ran testmain.cpp, inserting h led to insertFixUp on F, and for some reason, the program is recognizing G as f's grandparent and h as f's uncle, which just makes no sense tbh.
+you got this bro. if you make it work for left child, you just copy and flip it for right child. then you just need removal fixup to work and copy constructor. easy 80 on the resubmit. finger's
+crossed emily will take your shift tomorrow and you can get this done.
 */
