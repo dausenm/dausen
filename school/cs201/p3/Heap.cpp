@@ -1,5 +1,4 @@
 #include <iostream>
-#include "CircularDynamicArray.cpp"
 
 using namespace std;
 
@@ -14,10 +13,10 @@ class Heap{
 
     Heap(){
         size = 0;
-        h = new CircularDynamicArray()<T>;
+        h = new CircularDynamicArray<T>;
     }
     
-    Heap(K array[], int s){
+    Heap(T array[], int s){
         this->size = s;
     }
     
@@ -26,16 +25,16 @@ class Heap{
         delete this->h;
     }
 
-    K peekKey(){
+    T peekKey(){
         return h[1];
     }
     
-    K extractMin(){
+    T extractMin(){
         //return the min key and maintain heap properties
     }
 
-    void insert(K key){
-        h->addEnd(key)
+    void insert(T key){
+        h->addEnd(key);
         size++;
     }
 

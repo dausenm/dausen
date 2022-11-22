@@ -8,7 +8,7 @@ class CircularDynamicArray{
     int size;
     int cap;
     int front = 0;
-    T noBugs = -2;
+    T noBugs;
 
     public:
         CircularDynamicArray(){     //default constructor. array should be capacity 2 and size 0
