@@ -16,7 +16,7 @@ using namespace std;
 int main(){
 	string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
 	int B[10] = {10,9,8,7,6,5,4,3,2,1};
-	
+	/*
 	Heap<int> T1, T2(B,10);
 	
 	T2.printKey();
@@ -35,7 +35,9 @@ int main(){
 	
 	T1.printKey();
 	//Should output 2 3 5 4 8 9 6 10 7
-	
+
+	cout << "\tD:here\n";
+	*/
 	CircularDynamicArray<FibHeapNode<string> *> H1;
 	FibHeap<string> X(A,10,H1), Y;
 
@@ -47,9 +49,13 @@ int main(){
 	//Rank 3
 	//A E H I F C D B
 
+	cout << "1------------------------------\n";
+
 	cout << X.extractMin() << endl;
 	//Should output A
 	
+	//cout << "\tD: printkey starts on the next line\n";
+
 	X.printKey();
 	//Should output
 	//Rank 0
@@ -58,10 +64,14 @@ int main(){
 	//Rank 3
 	//C E H I F J K D
 	
-	cout << X.extractMin() << endl;
+	cout << "2------------------------------\n";
+
+	cout << X.extractMin() << endl;	//IMPLEMENT THIS
 	//Should output B
 	
-	X.decreaseKey(H1[6],"A");   //This should decrease H to an A
+	cout << "3------------------------------\n";
+
+	X.decreaseKey(H1[6],"A");   //This should decrease H to an A FIX THIS
 	cout<<X.peekKey()<<endl;    //Should print an A
 	X.printKey();
 	//Should output
@@ -87,6 +97,10 @@ int main(){
 	//Rank 0
 	//E
 	
+	cout << "4------------------------------\n";
+
+	X.printRootList();
+
 	H1.addEnd(X.insert("Z"));
 	H1.addEnd(X.insert("P"));
 	cout << X.extractMin() << endl;
@@ -98,7 +112,6 @@ int main(){
 	//Rank 3
 	//B C J K D P Z E
 	
-	
 	CircularDynamicArray<FibHeapNode<string> *> H2;
 	H2.addEnd(Y.insert("M")); 
 	H2.addEnd(Y.insert("O"));
@@ -106,9 +119,10 @@ int main(){
 	H2.addEnd(Y.insert("N"));
 	H2.addEnd(Y.insert("L"));
 	H2.addEnd(Y.insert("A"));
+	Y.printRootList();
 	Y.extractMin();
 		
-	Y.printKey();
+	//Y.printKey();
 	//Should output
 	//Rank 0
 	//L
@@ -116,6 +130,8 @@ int main(){
 	//Rank 2
 	//G M O N
 	
+	cout << "6------------------------------\n";
+
 	Y.merge(X);
 	cout << Y.peekKey() << endl;
 	//Should output B
@@ -134,7 +150,11 @@ int main(){
 	//Rank 3
 	//B C J K D P Z E
 
-	Y.extractMin();
+
+
+	cout << " 7------------------------------\n";
+
+	cout << Y.extractMin() << endl;
 	//Should output B
 
 	Y.printKey();

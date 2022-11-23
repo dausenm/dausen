@@ -4,13 +4,13 @@ using namespace std;
 template <class T>
 class CircularDynamicArray{
     private:
-    T *array;
     int size;
     int cap;
     int front = 0;
     T noBugs;
 
     public:
+        T *array;
         CircularDynamicArray(){     //default constructor. array should be capacity 2 and size 0
             array = new T [2];
             cap = 2;
