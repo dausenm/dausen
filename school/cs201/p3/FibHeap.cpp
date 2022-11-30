@@ -139,7 +139,7 @@ class FibHeap{
             }
         }
 
-        void findNewMin(){
+        void findNewMin(){      //finds the new minimum in the heap after extractMin, decreaseKey, and merge
             min = head;
             FibHeapNode<T> *trav = head;
 
@@ -161,7 +161,7 @@ class FibHeap{
             FibHeapNode<T> *newOne = new FibHeapNode<T>(k);
             size++;
 
-            if(head == NULL){
+            if(head == NULL){       //this case is for when the heap is empty
                 head = newOne;
                 tail = newOne;
                 min = newOne;
@@ -169,7 +169,7 @@ class FibHeap{
                 newOne->left = newOne;
                 return newOne;
             }
-            else if (tail == head){
+            else if (tail == head){     //this case is for when the heap only has one node in the root list
                 if(newOne->key < min->key) min = newOne;
                 tail = newOne;
                 newOne->left = head;
@@ -179,7 +179,7 @@ class FibHeap{
 
                 return newOne;
             }
-            else{
+            else{       //non edge case insert (heap has more than one node in the root list)
                 if(newOne->key < min->key) min = newOne;
                 tail->right = newOne;
                 newOne->right = head;
@@ -250,7 +250,7 @@ class FibHeap{
 
 
             node->p = NULL;
-            if(head == tail){
+            if(head == tail){       //this case is for when the heap only has one node in the root list
                 tail = node;
                 head->right = tail;
                 tail->right = head;
@@ -265,12 +265,12 @@ class FibHeap{
                 tail = node;
             }
 
-            if(pMark){
+            if(pMark){      //this block for if the parent is marked
                 decreaseKeyFixUp(parent);
             }
         }
 
-        void merge(FibHeap<T> &H2){ //merges two fib heaps. i assume we just add the root list of h2 to this->rootList after tail.
+        void merge(FibHeap<T> &H2){ //merges two fib heaps. adds the root list of h2 to the root list of h1
             FibHeapNode<T> *head2 = H2.head;
             FibHeapNode<T> *tail2 = H2.tail;
 
@@ -338,7 +338,7 @@ class FibHeap{
             }
         }
 
-        void consolidate(){
+        void consolidate(){     //consolidate combines two fib heap trees when their degrees are the same
 
             FibHeapNode<T> *trav = head;
 
@@ -376,7 +376,7 @@ class FibHeap{
             return;
         }
 
-        void checkRootOrder(){
+        void checkRootOrder(){      //this function maintains the order of the root list for output purposes
             if (tail == head || head == NULL) return;
 
             FibHeapNode<T> *trav = head;
@@ -390,7 +390,7 @@ class FibHeap{
             }
         }
 
-        void reorder(FibHeapNode<T> *first, FibHeapNode<T> *second){
+        void reorder(FibHeapNode<T> *first, FibHeapNode<T> *second){        //reorder is a helper function for checkRootOrder that swaps two nodes' orders.
             if(first == head){
                 head = second;
             }
@@ -409,7 +409,7 @@ class FibHeap{
             return;
         }
 
-        FibHeapNode<T> *combine(FibHeapNode<T> *N1, FibHeapNode<T> *N2){
+        FibHeapNode<T> *combine(FibHeapNode<T> *N1, FibHeapNode<T> *N2){        //combine is a helper function for consolidate, handles the logic of actually combining the two trees
             FibHeapNode<T> *rt;
             if(N1->key < N2->key){
                 rt = N1;
@@ -468,7 +468,7 @@ class FibHeap{
             return rt;
         }
 
-        void addToC(FibHeapNode<T> *parent, FibHeapNode<T> *child){
+        void addToC(FibHeapNode<T> *parent, FibHeapNode<T> *child){     //this function is a helper for combine. it adds the smaller tree to the children of the larger one
             child->p = parent;
             FibHeapNode<T> *trav = parent->c;
 

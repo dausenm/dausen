@@ -88,7 +88,7 @@ class Heap{
         h->delEnd();
 
         floatDown(1);
-        //return the min key and maintain heap properties
+        
         return min;
     }
 
@@ -112,9 +112,6 @@ class Heap{
     }
 
     void printKey(){
-        //cout << "\td: in printkey\n";
-
-        //cout << h->array[1] << "\n\n";
         for (int i = 1; i <= size; i++){
             cout << h->array[i] << " ";
         }
