@@ -52,7 +52,7 @@ class Heap{
             return;
         }
 
-        if(h->array[index * 2] < h->array[index] && h->array[(index * 2) + 1]){
+        if(h->array[index * 2] < h->array[index] && h->array[(index * 2) + 1] < h->array[index]){
             if(h->array[(index * 2) + 1] < h->array[index * 2]){
                 swap(h->array[(index * 2) + 1], h->array[index]);
                 floatDown(index * 2 + 1);
@@ -68,7 +68,7 @@ class Heap{
         }
         else if(h->array[(index * 2) + 1] < h->array[index]){
             swap(h->array[(index * 2) + 1], h->array[index]);
-            floatDown(h->array[(index * 2) + 1]);
+            floatDown(index * 2 + 1);
         }
         return;
     }
