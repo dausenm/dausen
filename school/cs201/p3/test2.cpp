@@ -19,13 +19,15 @@ int main(){
 
     for (int i = -100; i < 100; i++) H1.insert(i);
 
-    for(int i = 0; i < 200; i++){
+    for(int i = 0; i < 100; i++){
         if(H1.peekKey() != i - 100){
             cout << "i = " << i << " peekKey error\n";
+            H1.printKey();
+
         }
 
         if(H1.extractMin() != i - 100){
-            cout << "extractMin error\n";
+            cout << "i = " << i << " extractMin error\n";
         }
     }
 
