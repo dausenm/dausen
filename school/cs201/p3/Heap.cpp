@@ -103,12 +103,16 @@ class Heap{
 
         if (size == 1) return;
 
-        while(h->array[index] < h->array[index / 2]){
-            swap(h->array[index], h->array[index /2]);
-            index = index / 2;
-            if (index == 1) break;
-        }
+        floatUp(size);
 
+    }
+
+    void floatUp(int index){
+        if (index == 1) return;
+        if(h->array[index] < h->array[index / 2]){
+            swap (h->array[index], h->array[index / 2]);
+            floatUp(index / 2);
+        }
     }
 
     void printKey(){
