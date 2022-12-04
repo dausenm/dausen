@@ -25,6 +25,13 @@ int main(){
 
     T1.consolidate();
 
+    H1.addEnd(T1.insert('d'));
+
+    H1.addEnd(T1.insert('c'));
+    
+    T1.consolidate();
+
+
     // H1.addEnd(T1.insert('c'));
 
     // H1.addEnd(T1.insert('d'));
