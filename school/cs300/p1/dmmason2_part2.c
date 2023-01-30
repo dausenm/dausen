@@ -65,26 +65,24 @@ int main(void){
         if(command[0] == '!'){
             hFunc = 1;
             if(command[1] == '!'){
-                printf("you're here\n");
-                if(hCount < 10){
-                    addToHist(hist, hist[hCount - 1 % 10], hCount);
-                    hCount++;
-                    parseArgs(hist[hCount - 1 % 10], args);
-                }
-                else{
-                    addToHist(hist, hist[hCount % 10], hCount);
-                    hCount++;
-                    parseArgs(hist[hCount % 10], args);
-                }
+                addToHist(hist, hist[(hCount - 1) % 10], hCount);
+                parseArgs(hist[(hCount - 1) % 10], args);
+                hCount++;
             }
             else if(isdigit(command[1])){
-                printf("hey bruh that's a digit\n");
-                char c = command[1];
-                int i = c - '0' ;
-                printf("i = %d", i);
-                addToHist(hist, hist[i - 1], hCount);
-                hCount++;
-                parseArgs(hist[i - 1], args);
+
+                if(isdigit(command[2])){
+                    addToHist(hist, hist[((hCount)) % 10], hCount);
+                    parseArgs(hist[((hCount)) % 10], args);
+                    hCount++;   
+                }
+                else{
+                    char c = command[1];
+                    int i = c - '0';
+                    addToHist(hist, hist[((hCount - i)) % 10], hCount);
+                    parseArgs(hist[((hCount - i)) % 10], args);
+                    hCount++;
+                }
             }
             else{
                 hFunc = 0;
@@ -120,7 +118,6 @@ int main(void){
 }
 
 void parseArgs(char *command, char *args[]){        //example input: ""
-    printf("pa: command: %s\n", command);
 
     char buf[MAX_LINE];
 
@@ -188,13 +185,17 @@ void addToHist(char *hist[], char command[], int hCount){
 }
 
 void printHistory(char *hist[], int hCount){
+    if(hCount == 0){
+        return;
+    }
+
     if(hCount < 10){
-        for(int i = 0; i < hCount; i++){
-            printf("%d %s\n", i + 1, hist[i]);
+        int counter = hCount - 1;
+        for(int i = hCount; i > 0; i--){
+            printf("%d %s\n", i, hist[hCount - i]);
         }
     }
     else{
-        printf("else\n");
         for(int i = 0; i < 10; i++){
             printf("%d %s\n", 10 - i, hist[(hCount + i) % 10]);
         }
