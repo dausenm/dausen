@@ -32,8 +32,6 @@ int main(void){
             break;
         }
 
-        char *args[MAX_LINE/2];
-
         char *a;
 
         a = strstr(command, "&");

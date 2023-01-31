@@ -1,9 +1,4 @@
 /*
-    TODO:
-        fix order of !! command
-        general bug testing
-*/
-/*
 Written by Dausen Mason.
 CWID: 11955307
 */
@@ -44,8 +39,6 @@ int main(void){
             return 0;
             break;
         }
-
-        char *args[MAX_LINE/2];
 
         char *a;
 
@@ -190,7 +183,6 @@ void printHistory(char *hist[], int hCount){
     }
 
     if(hCount < 10){
-        int counter = hCount - 1;
         for(int i = hCount; i > 0; i--){
             printf("%d %s\n", i, hist[hCount - i]);
         }
