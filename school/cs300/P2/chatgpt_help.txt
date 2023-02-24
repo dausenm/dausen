@@ -1,0 +1,75 @@
+To retrieve data from the BACKING_STORE.bin file using a physical address from addresses.txt, you can follow these steps:
+
+Open the BACKING_STORE.bin file in binary mode using fopen() function.
+
+Open the addresses.txt file in text mode using fopen() function.
+
+Read a physical address from addresses.txt file using fscanf() function.
+
+Calculate the corresponding page number and offset within the page using the formula: page_number = physical_address / 256 and offset = physical_address % 256.
+
+Seek to the starting position of the page in BACKING_STORE.bin file using fseek() function. The starting position of the page can be calculated as page_start = page_number * 256.
+
+Read the entire page from BACKING_STORE.bin file into a buffer using fread() function.
+
+Access the required data from the buffer using the calculated offset.
+
+Repeat steps 3 to 7 until all physical addresses have been processed.
+
+Close the addresses.txt and BACKING_STORE.bin files using fclose() function.
+
+Here is an example implementation of the above steps:
+
+c
+Copy code
+#include <stdio.h>
+
+#define PAGE_SIZE 256
+
+int main()
+{
+    // Open BACKING_STORE.bin file
+    FILE *bs_file = fopen("BACKING_STORE.bin", "rb");
+    if (bs_file == NULL) {
+        printf("Error: Unable to open BACKING_STORE.bin\n");
+        return 1;
+    }
+
+    // Open addresses.txt file
+    FILE *addr_file = fopen("addresses.txt", "r");
+    if (addr_file == NULL) {
+        printf("Error: Unable to open addresses.txt\n");
+        fclose(bs_file);
+        return 1;
+    }
+
+    // Buffer to hold a page of data
+    unsigned char page[PAGE_SIZE];
+
+    // Read physical addresses from addresses.txt and retrieve data from BACKING_STORE.bin
+    int physical_address;
+    while (fscanf(addr_file, "%d", &physical_address) == 1) {
+        // Calculate the page number and offset within the page
+        int page_number = physical_address / PAGE_SIZE;
+        int offset = physical_address % PAGE_SIZE;
+
+        // Seek to the starting position of the page in BACKING_STORE.bin
+        fseek(bs_file, page_number * PAGE_SIZE, SEEK_SET);
+
+        // Read the entire page into the buffer
+        fread(page, PAGE_SIZE, 1, bs_file);
+
+        // Access the required data from the buffer using the offset
+        unsigned char data = page[offset];
+
+        // Print the retrieved data
+        printf("Physical Address: %d, Value: %d\n", physical_address, data);
+    }
+
+    // Close the files
+    fclose(addr_file);
+    fclose(bs_file);
+
+    return 0;
+}
+Note that this implementation assumes that addresses.txt contains one physical address per line, and that each physical address is a non-negative integer. You may need to modify the implementation to suit your specific use case.
