@@ -23,13 +23,13 @@ int main(void){
         if(!strcmp(command, "exit")){
             printf("exiting\n");
             should_run = 0;
-            return 0;
-            break;
         }
 
         char *args[MAX_LINE/2];
 
         int w = parseArgs(command, args);
+
+        printf("w: %d\n", w);
 
         /**
         * After reading user input, the steps are:
@@ -42,7 +42,6 @@ int main(void){
             printf("child was created! wooooo!\n");
             printf("%s\n", command);
             execvp(args[0], args);
-            exit(0);
         }
 
         else if(pid > 0) {      //(3) if command included &, parent will invoke wait()
@@ -83,6 +82,7 @@ int parseArgs(char *command, char *args[]){        //example input: ""
 
         if(command[i] == ' ' || command[i] == '\0'){
             if(!strcmp(buf, "&")){
+                printf("& found\n");
                 rt = 1;
                 stop = 1;
                 continue;
