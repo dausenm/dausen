@@ -1,11 +1,12 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 const int VM_SIZE = 256;
 const int PAGE_SIZE = 256;
 const int TLB_SIZE = 16;
-const int MEM_SIZE = 256;
+int MEM_SIZE = 256;
 
 int main(int argc, char* argv[])
 {
@@ -15,6 +16,16 @@ int main(int argc, char* argv[])
 		printf("Error: Use ./a.out filename.txt\n");
 		return 1;
 	}
+
+    if(argc == 3){
+        if(!isdigit(argv[2])){
+            printf("Error: usage ./a.out filename.txt PhysicalMemorySize. Continuing with MEM_SIZE =256\n");
+        }
+        else{
+            int buf = atoi(argv[2]);
+            MEM_SIZE = buf;
+        }
+    }
 
 	fp = fopen(argv[1], "r");
 
