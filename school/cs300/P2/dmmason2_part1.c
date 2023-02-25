@@ -1,104 +1,139 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-#define TLB_SIZE 16
-#define PAGE_SIZE 256
-#define PAGE_TABLE_SIZE 256
+const int PAGE_SIZE = 256;
+const int TLB_SIZE = 16;
+const int MEM_SIZE = 256;
 
-int tlb[TLB_SIZE][2]; // TLB with 16 slots
-int page_table[PAGE_TABLE_SIZE]; // Page table with 256 entries
+int main(int argc, char* argv[]){
+	FILE *fp;
+	
+	if(argc < 2){
+		printf("Error: Use ./a.out filename.txt\n");
+		return 1;
+	}
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: ./program filename.txt\n");
-        return 1;
-    }
+	fp = fopen(argv[1], "r");
 
-    char *filename = argv[1];
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL) {
-        printf("Unable to open file: %s\n", filename);
-        return 1;
-    }
+	if(fp == NULL){
+		printf("Error: File not found: \"%s\"\n", argv[1]);
+		return 1;
+	}
 
-    int num_hits = 0;
-    int num_misses = 0;
+	char value[256];
 
-    int i, j;
-    for (i = 0; i < TLB_SIZE; i++) {
-        tlb[i][0] = -1; // Initialize TLB entries to invalid page number
-    }
+	long long pageNum;
+	long long offset;
+	long long TLBHits = 0;
+	long long pageFaults = 0;
+	long long pages = 0;
 
-    for (i = 0; i < PAGE_TABLE_SIZE; i++) {
-        page_table[i] = -1; // Initialize page table entries to invalid frame number
-    }
+	char physMem[MEM_SIZE][MEM_SIZE];
+	
+	int q = 0;	//to maintain the fifo replacement queue position
+	int physAddr = 0, frame, logAddr;
+	
+	int tlb[TLB_SIZE][2];
+	int pageTable[PAGE_SIZE];
 
-    char logical_address_str[10];
-    int logical_address;
-    int physical_address;
-    int page_number;
-    int page_offset;
-    int frame_number;
-    int signed_byte;
-    while (fgets(logical_address_str, 10, fp)) {
-        logical_address = atoi(logical_address_str);
+	memset(tlb, -1, TLB_SIZE * 2 * sizeof(tlb[0][0]));
+	memset(pageTable, -1, sizeof(pageTable));
+	
+	int mask = 255;
+	int i;
+	int hit;
+	int data;
+	
+	while(fgets(value, 64, fp)){
+		pages++;		//increment pages at the top of the loop, keep track of how many pages we have looped through
+		//get page number and offset from logical address
+		pageNum = atoi(value);
+		pageNum = pageNum >> 8;
+		pageNum = pageNum & mask;
+		
+		offset = atoi(value);
+		offset = offset & mask;
+		
+		logAddr = atoi(value);
 
-        // Take logical address and extract page number and offset
-        page_number = (logical_address >> 8) & 0xff;
-        page_offset = logical_address & 0xff;
+		frame = 0, physAddr = 0;
+		
+		hit = 0;			//This will be set to 1 if it is found in TLB
+		
+		//Check in TLB for page
+		
+		for(i = 0; i < TLB_SIZE; i++){
+			if(tlb[i][0] == pageNum){
+				hit = 1;
+				frame = tlb[i][1];
+				data = physMem[tlb[i][1]][offset];
+				break;
+			}
+		}
+		if(hit) TLBHits++;
 
-        printf("page number: %d, page offset: %d\n", page_number, page_offset);
+		//If not found in TLB, search in page table
+		else if(hit != 1){
+			int freeFrame = 0;
+			for(i = 0; i < PAGE_SIZE; i++){
+				if(pageTable[i] == pageNum){
+					frame = i;
+					break;
+				}
+				if(pageTable[i]==-1){
+					freeFrame = 1;
+					pageFaults++;
+					break;
+				}
+			}
+			if(freeFrame == 1){
+				pageTable[i] = pageNum;
+				frame = i;
+			}
 
-        // Check if page number is in tlb
-        int tlb_hit = 0;
-        for (i = 0; i < TLB_SIZE; i++) {
-            if (tlb[i][0] == page_number) {
-            tlb_hit = 1;
-            frame_number = tlb[i][1];
-            num_hits++;
-            break;
-            }
-        }
+			//replace in tlb using fifo
+			tlb[q][0] = pageNum;
+			tlb[q][1] = frame;
+			if(freeFrame){
+				//find value from BACKING_STORE.bin
+				FILE *bs = fopen("BACKING_STORE.bin", "rb");
 
-        // If not in tlb, check page table
-        if (!tlb_hit) {
-            if (page_table[page_number] == -1) {
-                // Page fault, we must read page from backing store into physical memory
-                char *filename = "BACKING_STORE.bin";
-                FILE *fp_backing_store = fopen(filename, "rb");
-                if (fp_backing_store == NULL) {
-                    printf("Unable to open file: %s\n", filename);
-                    return 1;  
-                }
-    
-                fseek(fp_backing_store, page_number * PAGE_SIZE, SEEK_SET);
-                char page_buffer[PAGE_SIZE];
-                fread(page_buffer, 1, PAGE_SIZE, fp_backing_store);
-                fclose(fp_backing_store);
+				if(bs == NULL){
+					printf("Error: BACKING_STORE.bin not found.\n");
+					return 1;
+				}
 
-                // Locate free frame
-                int free_frame_number = -1;
-                for (i = 0; i < PAGE_TABLE_SIZE; i++) {
-                    if (page_table[i] == -1) {
-                    free_frame_number = i;
-                    break; 
-                    }
-                }
+				char buffer[PAGE_SIZE];
 
-                // If no free frame, evict page from physical memory using FIFO policy
-                if (free_frame_number == -1) {
-                    free_frame_number = num_misses % PAGE_TABLE_SIZE;
-                    int evicted_page_number = -1;
-                    for (j = 0; j < PAGE_TABLE_SIZE; j++) {
-                        if (page_table[j] == free_frame_number) {
-                            evicted_page_number = j;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return 0;
+				fseek(bs, pageNum * PAGE_SIZE, SEEK_SET);
+				fread(buffer, 256, 1, bs);
+
+				data = (int)buffer[offset];
+
+				fclose(bs);
+				
+				for(int j = 0; j < MEM_SIZE; j++){
+					physMem[frame][j] = buffer[j];
+				}
+			}
+
+			data = physMem[frame][offset];
+
+			q++;
+			q = q % 15;
+		}
+
+		physAddr = frame * PAGE_SIZE + offset;
+		printf("Virtual address: %d \t\tPhysical address: %d Value: %d\n", logAddr, physAddr, data);
+	}
+	double hitRate = ((double)TLBHits / (double)pages);
+	double faultRate = ((double)pageFaults / (double)pages);
+
+    printf("Number of Translated Addresses = %d\n", (int)pages);
+    printf("Page Faults = %d\n", (int)pageFaults);
+    printf("Page Fault Rate = %.3lf\n", faultRate);
+    printf("TLB Hits = %d\n", (int)TLBHits);
+    printf("TLB Hit Rate = %.3lf\n", hitRate);
 }
-        
