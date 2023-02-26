@@ -1,3 +1,7 @@
+/*
+	Written by Dausen Mason		CWID: 11955307
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,26 +21,16 @@ int main(int argc, char* argv[]){
 		printf("Error: Use ./a.out filename.txt\n");
 		return 1;
 	}
-	
-	if(argc == 3){
-		printf("%s\n", argv[2]);
-		//if(isdigit(atoi(argv[2]))){
-			//printf("\tD: here\n");
-			int sz;
-			char *ptr = argv[2];
-			sz = atoi(ptr);
-			//printf("D:%d\n", sz);
-			MEM_SIZE = sz;
-			//printf("D:HERE\n");
-		//}
-		//else printf("argv[2] not a digit, MEM_SIZE set to 256\n");
-	}
 
 	fp = fopen(argv[1], "r");
 
 	if(fp == NULL){
 		printf("Error: File not found: \"%s\"\n", argv[1]);
 		return 1;
+	}
+
+	if(argc == 3){
+		MEM_SIZE = atoi(argv[2]);
 	}
 
 	char value[256];
@@ -47,8 +41,9 @@ int main(int argc, char* argv[]){
 	long long pageFaults = 0;
 	long long pages = 0;
 
-	char physMem[MEM_SIZE][MEM_SIZE];
+	char physMem[MEM_SIZE][PAGE_SIZE];
 	
+	int q = 0;	//to maintain the fifo replacement queue position for tlb
 	int physAddr = 0, frame, logAddr;
 	
 	int tlb[TLB_SIZE][2];
@@ -61,12 +56,11 @@ int main(int argc, char* argv[]){
 	int i;
 	int hit;
 	int data;
+	int lru[MEM_SIZE];
 	int clock = 0;
-	int lru[TLB_SIZE];
-	int ptLru[PAGE_SIZE];
 	
 	while(fgets(value, 64, fp)){
-		clock++;	//clock will be used to implement lru replacement
+		clock++;
 		pages++;		//increment pages at the top of the loop, keep track of how many pages we have looped through
 		//get page number and offset from logical address
 		pageNum = atoi(value);
@@ -87,9 +81,9 @@ int main(int argc, char* argv[]){
 		for(i = 0; i < TLB_SIZE; i++){
 			if(tlb[i][0] == pageNum){
 				hit = 1;
-				lru[i] = clock;
 				frame = tlb[i][1];
 				data = physMem[tlb[i][1]][offset];
+				lru[frame] = clock;
 				break;
 			}
 		}
@@ -97,35 +91,30 @@ int main(int argc, char* argv[]){
 
 		//If not found in TLB, search in page table
 		else if(hit != 1){
-			int freeFrame = 0;
 			int found = 0;
+			int freeFrame = 0;
 			for(i = 0; i < MEM_SIZE; i++){
 				if(pageTable[i] == pageNum){
 					frame = i;
-					ptLru[i] = clock;
 					found = 1;
+					lru[i] = clock;
 					break;
 				}
-				if(pageTable[i]==-1){
+				if(pageTable[i] == -1){
 					freeFrame = 1;
 					pageFaults++;
+					lru[i] = clock;
 					break;
 				}
 			}
 			if(freeFrame == 1){
 				pageTable[i] = pageNum;
 				frame = i;
-				ptLru[i] = clock;
 			}
 
-			if(found == 1){
-				//replace in tlb using lru
-				//find lru
-				int min = findMin(lru, 16);
-
-				tlb[min][0] = pageNum;
-				tlb[min][1] = frame;
-			}
+			//replace in tlb using fifo
+			tlb[q][0] = pageNum;
+			if(found || freeFrame)	tlb[q][1] = frame;
 
 			if(freeFrame){
 				//find value from BACKING_STORE.bin
@@ -145,19 +134,14 @@ int main(int argc, char* argv[]){
 
 				fclose(bs);
 				
-				for(int j = 0; j < MEM_SIZE; j++){
+				for(int j = 0; j < PAGE_SIZE; j++){
 					physMem[frame][j] = buffer[j];
 				}
-
-				int min = findMin(lru, 16);
-
-				tlb[min][0] = pageNum;
-				tlb[min][1] = frame;
 			}
-			else{
-				pageFaults++;
 
-				int min = findMin(ptLru, PAGE_SIZE);
+			if(!found && !freeFrame){
+				pageFaults++;
+				int min = findMin(lru, MEM_SIZE);
 
 				pageTable[min] = pageNum;
 
@@ -176,21 +160,22 @@ int main(int argc, char* argv[]){
 				data = (int)buffer[offset];
 
 				fclose(bs);
-
-				for(int j = 0; j < MEM_SIZE; j++){
+				
+				for(int j = 0; j < PAGE_SIZE; j++){
 					physMem[min][j] = buffer[j];
 				}
-
+				
 				frame = min;
 
-				//update tlb
-				min = findMin(lru, 16);
+				lru[min] = clock;
 
-				tlb[min][0] = pageNum;
-				tlb[min][1] = frame;
+				tlb[q][1] = frame;
 			}
 
-			data = physMem[frame][offset];
+			data = (int)physMem[frame][offset];
+
+			q++;
+			q = q % 16;
 		}
 
 		physAddr = frame * PAGE_SIZE + offset;
@@ -206,11 +191,12 @@ int main(int argc, char* argv[]){
     printf("TLB Hit Rate = %.3lf\n", hitRate);
 }
 
-int findMin(int array[], int size){
-	int rt = array[0];
+int findMin(int array[], int size){		//findMin returns the index of the minimum element in the array that is taken in
+	int min = array[0];
+	int rt = 0;
 
-	for(int i = 0; i < size; i++){
-		if(array[i] < rt) rt = array[i];
+	for (int i = 0; i < size; i++){
+		if (array[i] < min) rt = i;
 	}
 
 	return rt;

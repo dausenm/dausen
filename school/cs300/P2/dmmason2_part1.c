@@ -1,3 +1,7 @@
+/*
+	Written by Dausen Mason		CWID 11955307
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,7 +126,7 @@ int main(int argc, char* argv[]){
 			data = physMem[frame][offset];
 
 			q++;
-			q = q % 15;
+			q = q % 16;
 		}
 
 		physAddr = frame * PAGE_SIZE + offset;
