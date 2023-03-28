@@ -116,7 +116,7 @@ void *server_thread(void *arg) {
     struct lunch *lunch = (struct lunch *)arg;
     sem_post(&lunch->server_count);
     while (1) {
-        sem_wait(&lunch->server_count); //This wait is to wait for a free server
+        sem_wait(&lunch->server_count); //Wait for a free server
         if(done){
             break;
         }
@@ -134,6 +134,8 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    int i;
+
     int customers = atoi(argv[2]);
     int servers = atoi(argv[1]);
 
@@ -146,30 +148,30 @@ int main(int argc, char *argv[]) {
 
     //Create customer threads
     pthread_t custThreads[customers];
-    for (int i = 0; i < customers; i++) {
+    for (i = 0; i < customers; i++) {
         pthread_create(&custThreads[i], NULL, customer_thread, &lunch);
     }
 
     //Create server threads
     pthread_t serverThreads[servers];
-    for (int i = 0; i < servers; i++) {
+    for (i = 0; i < servers; i++) {
         pthread_create(&serverThreads[i], NULL, server_thread, &lunch);
     }
 
-    // Next, we join the customer threads
-    for (int i = 0; i < customers; i++) {
+    //Join customer threads
+    for (i = 0; i < customers; i++) {
         pthread_join(custThreads[i], NULL);
     }
 
-    //Next, we wait for all of the customers to be served
+    //Wait for all customers to be served
     while (lunch.servedCount < customers){
         sleep(1);
     }
     //Set done = 1 so that the program can exit
     done = 1;
 
-    // Finally, we join the server threads
-    for (int i = 0; i < servers; i++) {
+    //Join server threads
+    for (i = 0; i < servers; i++) {
         pthread_join(serverThreads[i], NULL);
     }
 
