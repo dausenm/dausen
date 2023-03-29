@@ -126,6 +126,7 @@ void *server_thread(void *serv) {
         if(done) break;
         sem_wait(&lunch->server_count); //Wait for a free server
         lunch_wait_customer(lunch);
+        sem_post(&lunch->server_count);
         sem_post(&lunch->servers);
     }
     sem_post(&lunch->server_count);
@@ -158,14 +159,20 @@ int main(int argc, char *argv[]) {
     //Create customer threads
     pthread_t custThreads[customers];
     for (i = 0; i < customers; i++) {
-        pthread_create(&custThreads[i], NULL, customer_thread, &lunch);
+    if (pthread_create(&custThreads[i], NULL, customer_thread, &lunch) != 0) {
+        printf("Error: failed to create customer thread %d\n", i);
+        return 0;
     }
+}
 
     //Create server threads
     pthread_t serverThreads[servers];
     for (i = 0; i < servers; i++) {
-        pthread_create(&serverThreads[i], NULL, server_thread, &lunch);
+    if (pthread_create(&serverThreads[i], NULL, server_thread, &lunch) != 0) {
+        printf("Error: failed to create server thread %d\n", i);
+        return 0;
     }
+}
 
     //Join customer threads
     for (i = 0; i < customers; i++) {
@@ -179,7 +186,6 @@ int main(int argc, char *argv[]) {
     //Set done = 1 so that the program can exit
     done = 1;
 
-    printf("joining server threads\n");
 
     //Join server threads
     for (i = 0; i < servers; i++) {
