@@ -33,10 +33,10 @@ void nowServing(int ticket){
 }
 
 void lunch_init(struct lunch *lunch) {
-    lunch->custCount = 0;
-    lunch->serverCount = 0;
     lunch->currentTicket = 0;
     lunch->nextTicket = 1;
+    lunch->custCount = 0;
+    lunch->serverCount = 0;
 
     sem_init(&lunch->customers, 0, 0);
     sem_init(&lunch->servers, 0, 0);
@@ -73,7 +73,11 @@ int lunch_get_ticket(struct lunch *lunch) {
 void lunch_wait_turn(struct lunch *lunch, int ticket) {
     printf("%ld enter lunch_wait_turn with %d\n", pthread_self(), ticket); 
     sem_wait(&lunch->servers);
+
     printf("%ld leave lunch_wait_turn after ticket %d\n", pthread_self(), ticket);
+    sem_post(&lunch->servers);
+
+    return;
 }
 
 void lunch_wait_customer(struct lunch *lunch) {
@@ -97,8 +101,8 @@ void lunch_wait_customer(struct lunch *lunch) {
     nowServing(ticket);
 
     pthread_mutex_unlock(&lunch->mutex);
-    sem_post(&lunch->servers);
     sem_post(&lunch->server_count);
+    sem_post(&lunch->servers);
 
     printf("%ld after served ticket %d\n", pthread_self(), ticket);
     printf("%ld leave lunch_wait_customer\n", pthread_self());
@@ -119,11 +123,10 @@ void *server_thread(void *serv) {
     struct lunch *lunch = (struct lunch *)serv;
     sem_post(&lunch->server_count);
     while (1) {
+        if(done) break;
         sem_wait(&lunch->server_count); //Wait for a free server
-        if(done){
-            break;
-        }
         lunch_wait_customer(lunch);
+        sem_post(&lunch->servers);
     }
     sem_post(&lunch->server_count);
     
@@ -146,6 +149,9 @@ int main(int argc, char *argv[]) {
         printf("Error: customers and servers must both be greater than 1.\n");
         return 0;
     }
+
+    srand(time(0));
+
     struct lunch lunch;
     lunch_init(&lunch);
 
@@ -177,7 +183,6 @@ int main(int argc, char *argv[]) {
 
     //Join server threads
     for (i = 0; i < servers; i++) {
-        printf("Top for: i = %d\n", i);
         pthread_join(serverThreads[i], NULL);
     }
 
