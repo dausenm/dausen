@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-string lethals[] = {"claymore", "frag", "molotov", "c4", "drill charge", "sticky grenade", "throwing knife", "proximity mine", "thermite", "tomahawk"};
+string lethals[] = {"claymore", "frag", "molotov", "c4", "drill charge", "sticky grenade", "throwing knife", "proximity mine", "thermite"};
 string tacticals[] = {"spotter scope", "flash grenade", "stun grenade", "smoke grenade", "snapshot grenade", "heartbeat sensor", "stim", "decoy", "gas grenade", "shock stick"};
 
 string basePerks[] = {"battle hardened", "double time", "scavenger", "tracker", "strong arm", "EOD", "extra tactical", "overkill", "scavenger"};
