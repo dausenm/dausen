@@ -1,0 +1,21 @@
+;define ++ for frame number
+(define ++ (x) + x 1)
+
+;define function to remove a throw from the list
+(define rem1throw (list) (cdr list))
+
+;define function to remove 2 throws from the list
+(define rem2throw (list) (cdr (cdr list)))
+
+;define function to check for strike
+(define strike? (list) ((car list) = 10))
+
+;define function to check for spare
+(define spare? (list) ((car list) + (car (cdr list)) = 10))
+
+;define scoreframeballs
+
+(define scoreframeballs (score frame balls) 
+
+    
+)
