@@ -1,0 +1,17 @@
+(cond b1 e1 b2 e2 b3 e3 t e4) //switch statement, if b1 return e1, if b2 return e2
+
+(if b1 e1 e2) //b1? e1: e2
+
+(begin e1 e2 e3) -> e3
+
+(define foo (args) body)
+
+ex:
+    (define foo (a b c) (+ a (+ b c)))
+
+    (define sorted?(list) (
+        (nil? list) t   ;this handles the empty list
+        (nil? (cdr list)) t   ;checks if the list has only one element.
+        (> (car list) (cadr list)) ()   ;not sorted
+        t (sorted? (cdr list))
+    ))
