@@ -7,8 +7,14 @@
 ;define function to remove 2 throws from the list
 (define rem2throw (list) (cdr (cdr list)))
 
+;define function to add 2 throws in case without spare or strike
+(add2 (list) ((car (list)) + (car (cdr (list)))))
+
+;define function to add 3 throws in case of a strike or spare
+(define add3 (list) (car(list) + car(cdr(list)) + car(cdr(cdr(list)))))
+
 ;define function to check for strike
-(define strike? (list) ((car list) = 10))
+(define strike? (list) (= (car list) 10))
 
 ;define function to check for spare
 (define spare? (list) ((car list) + (car (cdr list)) = 10))
@@ -16,6 +22,21 @@
 ;define scoreframeballs
 
 (define scoreframeballs (score frame balls) 
+    (if (< frame 11)(
+            (if (strike? (balls))
+                (scoreframeballs ((+ score (add3 (balls))) (++ frame) (rem1throw(balls))))
+            )
 
-    
+            if (spare? (balls)
+                (scoreframeballs ((+ score (add3 (balls))) (++ frame) (rem2throw(balls))))
+            )
+
+            (scoreframeballs((+ score (add2 (balls))) (++ frame) (rem2throw(balls))))
+        )
+        (score)
+    )
+)
+
+(define bowling (balls) 
+    scoreframeballs(0 1 balls)
 )
