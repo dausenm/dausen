@@ -1,31 +1,40 @@
 ;define function to check if we bust
-(define bust? (score) (< score 22))
+(define bust? (score) (> score 21))
 
 ;define a ++ function to keep track of how many cards are in the hand
 (define ++ (x) + x 1)
 
 ;function to find the score of a cards
-(define cardscore(card score) ( 
-    (if (= car(cards) 1))(
-        (if (bust? (+ score 11))(1)(11))
-    )(
-        (if(> car(cards) 10) (10) (car(cards)))
+(define cardscore (cards score)(
+    (if (nil?(car(cards))) (0)
+        (cond (= 1 car(cards)) (1)
+            (> 10 car(cards)) (10)
+            (t) (car(cards))
+        )
     )
 ))
 
+;function to determine if there is an ace in the hand
+(define ace? (cards)(
+    (cond   (nil?(car(cards))) (f)
+            (= car(cards) 1) (t)
+            (t) (ace?(cards)))
+))
+
 ;actual recursive blackjack scoring function
-(define scorecards (score count cards)
+(define scorecards (score count cards)(
     (if (bust?(score))(0)(
             (if (= cards 5)(21) (
                     (if (nil? car(cards)))(score)(
-                        (scorecards ((+ score (cardscore(car(cards score))))) (++ cards) (cdr(cards)))
+                        (scorecards ((+ score (cardscore(car(cards) score)))) (++ cards) (cdr(cards)))
                     )
                 )
             )
         )
     )
-)
+))
 
-(define blackjack (cards)
-    (scorecards (0 0 cards))
-)
+(define blackjack (cards)(
+    (set score (scorecards (0 0 cards)))
+    (if(and (ace?(cards) (< 12 score)))(+ 10 score) (score))
+))
