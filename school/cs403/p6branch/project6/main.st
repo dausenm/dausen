@@ -4,47 +4,52 @@ Object subclass: PayrollSystem [
     ]
 
     PayrollSystem >> readFrom: fileName [
-        | file employees |
+    | file employees |
 
-        Display display: 'Reached here1' displayNL.
+    Display display: 'Reached here1' displayNL.
 
-        file := FileStream readOnlyFileNamed: fileName.
-        employees := OrderedCollection new. "You can use other collection types if needed"
+    file := FileStream readOnlyFileNamed: fileName.
+    employees := OrderedCollection new. 
 
-        [file atEnd] whileFalse: [
-            | lineParts employee |
+    [file atEnd] whileFalse: [
+        | lineParts employee |
 
-            lineParts := (file nextLine) split: ' '.
+        lineParts := (file nextLine) split: ' '.
+        Display display: 'Line parts: ' , lineParts asString displayNL.
 
-            "Parse lineParts to determine employee type and create appropriate employee instance"
-            employee := self createEmployeeFromLine: lineParts.
+        "Parse lineParts to determine employee type and create appropriate employee instance"
+        employee := self createEmployeeFromLine: lineParts.
+        Display display: 'Employee: ' , employee printString displayNL.
 
-            "Add the employee to the collection"
-            employees add: employee.
-        ].
+        "Add the employee to the collection"
+        employees add: employee.
+    ].
 
-        file close.
-        ^employees asArray. "Convert the ordered collection to an array"
-    ]
+    file close.
+    ^employees asArray. "Convert the ordered collection to an array"
+]
+
 
     PayrollSystem >> createEmployeeFromLine: lineParts [
     | type employee |
 
-    Display display: 'Reached here2' displayNL.
-
     type := lineParts first.
 
     "Check the type of employee and create the appropriate instance"
-    type = 'salaried' ifTrue: [
-        employee := SalariedEmployee newWith: lineParts second and: lineParts third asNumber.
+    employee := type = 'salaried' ifTrue: [
+        SalariedEmployee newWith: lineParts second and: lineParts third and: lineParts fourth asNumber
     ] ifFalse: [type = 'hourly' ifTrue: [
-        employee := HourlyEmployee newWith: lineParts second and: lineParts third asNumber and: lineParts fourth asNumber.
+        HourlyEmployee newWith: lineParts second and: lineParts third  and: lineParts fourth asNumber and: lineParts fifth asNumber
     ] ifFalse: [type = 'commission' ifTrue: [
-        employee := CommissionEmployee newWith: lineParts second and: lineParts third asNumber and: lineParts fourth asNumber and: lineParts fifth asNumber.
+        CommissionEmployee newWith: lineParts second and: lineParts third and: lineParts fourth asNumber and: lineParts fifth asNumber and: lineParts sixth asNumber
+    ] ifFalse: [
+        self error: 'Unknown employee type: ', type.
     ]]].
 
-    ^employee.
+    ^employee
 ]
+
+
 
 
 
@@ -72,12 +77,15 @@ Object subclass: PayrollSystem [
     ]
 
     PayrollSystem >> main: args [
-    | employees fileName countThreshold operation conditionValue conditionOp result |
+    | employees fileName countThreshold operation conditionValue conditionOp result flagIndex|
 
     Display display: 'Reached here3' displayNL.
 
     "Parse command line arguments"
-    fileName := args at: args indexOf: '-f' ifAbsent: [self error: 'File name not provided'].
+    flagIndex := args indexOf: '-f'.
+    flagIndex ifNil: [self error: 'File name not provided'].
+    fileName := args at: flagIndex + 2.
+
     countThreshold := args last asNumber ifNil: [self error: 'Threshold value not provided'].
     operation := args at: args size - 2.
     conditionValue := args last.
