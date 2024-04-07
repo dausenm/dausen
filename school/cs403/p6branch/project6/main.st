@@ -76,18 +76,20 @@ Object subclass: PayrollSystem [
         ^ false.
     ]
 
-    PayrollSystem >> main: args [
-    | employees fileName countThreshold operation conditionValue conditionOp result flagIndex|
+    PayrollSystem class >> main: args [
+    | employees fileName countThreshold operation conditionValue conditionOp result flagIndex |
 
-    Display display: 'Reached here3' displayNL.
+    Transcript show: 'Hello World'; cr.
 
-    "Parse command line arguments"
-    flagIndex := args indexOf: '-f'.
-    flagIndex ifNil: [self error: 'File name not provided'].
-    fileName := args at: flagIndex + 2.
+    flagIndex := 0.
+    1 to: args size do: [:index |
+        (args at: index) = '-f' ifTrue: [flagIndex := index].
+    ].
+    flagIndex = 0 ifTrue: [self error: 'Flag index not provided'].
 
+    fileName := args at: flagIndex + 2 ifAbsent: [self error: 'File name not provided'].
     countThreshold := args last asNumber ifNil: [self error: 'Threshold value not provided'].
-    operation := args at: args size - 2.
+    operation := args at: args size - 2 ifAbsent: [self error: 'Operation not provided'].
     conditionValue := args last.
 
     "Read employee data from file"
@@ -95,12 +97,11 @@ Object subclass: PayrollSystem [
 
     "Perform operation"
     operation = 'count' ifTrue: [
-        conditionOp := args at: args size - 1.
+        conditionOp := args at: args size - 1 ifAbsent: [self error: 'Condition operator not provided'].
         result := self countEmployees: employees operation: operation conditionOp: conditionOp threshold: countThreshold value: conditionValue.
         'Number of employees satisfying condition: ', result asString displayNL.
     ] ifFalse: [self error: 'Unsupported operation'].
-]     
-
+]
 
 
     PayrollSystem >> countEmployees: employees operation: operation conditionOp: conditionOp threshold: threshold value: value [
@@ -118,4 +119,7 @@ Object subclass: PayrollSystem [
         ].
         ^ count.
     ]
-].
+]
+
+
+PayrollSystem main: args.
